@@ -1,3 +1,5 @@
+package javaPractice.overrideTest;
+
 public class Child extends Parent{
     void method(){
         System.out.println("자식 메서드 실행");
