@@ -29,8 +29,24 @@ public class Test {
 -
 
 # 내가 헷갈렸던 내용
-
-## 이를 확실히 기억하기 위해 개념적으로 정리한 것 + code
+## Static이 아닌 class안에 static 변수를 선언할 수 있는 이유
+- static은 JVM이 구동될 때 메모리에 올라 가 있으며
+- 클래스가 로드될 때, 메모리에는 클래스 정보가 올라간다.
+- 따라서, Class.변수명 식으로 다른 클래스에서 인스턴스 생성 없이 호출 하여도 Class를 적는 순간 class 정보는 올라가고 static은 이미 메모리에 올라가 있었으므로 문제가 없다.
+```java
+   class Static {
+    static int b = 10;
+    public int a = 20;
+   }
+   
+   public class Test {
+       public static void main(String[] args) {
+           int a = 10;
+           Static.b = a;
+       }
+   }
+```
+### 이를 확실히 기억하기 위해 개념적으로 정리한 것 + code
 
 # 결론적으로, 이것을 기억해야 한다!
 
