@@ -1,4 +1,4 @@
-package javaPractice.thisTest;
+package helloJava.thisTest;
 
 public class Member {
     String name;

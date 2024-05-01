@@ -1,4 +1,4 @@
-package javaPractice.overrideTest;
+package helloJava.overrideTest;
 
 public class Main {
     public static void main(String[] args) {

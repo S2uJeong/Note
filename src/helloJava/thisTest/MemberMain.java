@@ -1,4 +1,4 @@
-package javaPractice.thisTest;
+package helloJava.thisTest;
 
 public class MemberMain {
     public static void main(String[] args) {

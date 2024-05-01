@@ -1,4 +1,4 @@
-package javaPractice.overrideTest;
+package helloJava.overrideTest;
 
 public class Child extends Parent{
     void method(){
