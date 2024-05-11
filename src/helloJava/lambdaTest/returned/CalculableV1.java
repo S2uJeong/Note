@@ -1,4 +1,4 @@
-package helloJava.lambdaTest;
+package helloJava.lambdaTest.returned;
 
 /**
  * 리턴 값이 있는 추상 메서드

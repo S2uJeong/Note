@@ -1,4 +1,4 @@
-package helloJava.lambdaTest;
+package helloJava.lambdaTest.methodReference;
 
 /**
  * String의 인스턴스 메소드인 comparToIgnoreCase를 메서드 참조로 사용해서

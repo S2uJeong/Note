@@ -1,4 +1,4 @@
-package helloJava.lambdaTest;
+package helloJava.lambdaTest.methodReference;
 
 public class PersonV2 {
     public void ordering(Comparable comparable) {

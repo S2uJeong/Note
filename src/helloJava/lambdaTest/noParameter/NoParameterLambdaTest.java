@@ -1,4 +1,4 @@
-package helloJava.lambdaTest;
+package helloJava.lambdaTest.noParameter;
 
 public class NoParameterLambdaTest {
     public static void main(String[] args) {

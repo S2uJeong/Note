@@ -1,4 +1,4 @@
-package helloJava.lambdaTest;
+package helloJava.lambdaTest.returned;
 
 public class ReturnedLambdaTest {
     public static void main(String[] args) {

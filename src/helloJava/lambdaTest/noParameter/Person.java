@@ -1,4 +1,4 @@
-package helloJava.lambdaTest;
+package helloJava.lambdaTest.noParameter;
 
 public class Person {
     public void action(Workable workable) {

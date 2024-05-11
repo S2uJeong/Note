@@ -1,4 +1,4 @@
-package helloJava.lambdaTest;
+package helloJava.lambdaTest.noParameter;
 
 /**
  * 매개변수가 없는 추상 클래스, 람다식

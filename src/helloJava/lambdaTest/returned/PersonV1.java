@@ -1,4 +1,4 @@
-package helloJava.lambdaTest;
+package helloJava.lambdaTest.returned;
 
 public class PersonV1 {
     public void action(CalculableV1 calculable) {
