@@ -1,6 +1,6 @@
 - 터미널과 aws에 띄운 linuxServer 연결하는 명령어 
   - chmod 400 linuxServerKey.pem
-  - ssh -i "linuxServerKey.pem" {ec2-user}@ec2-43-202-47-62.ap-northeast-2.compute.amazonaws.com
+  - ssh -i "linuxServerKey.pem" ubuntu@ec2-43-202-47-62.ap-northeast-2.compute.amazonaws.com
 
 ## 명령어 정리 (상위 커맨드 별)
 docker {상위 command} {하위 command} {option} {대상} {인자} 
@@ -109,6 +109,49 @@ docker {상위 command} {하위 command} {option} {대상} {인자}
 | shell      | 빌드 시 사용할 셰을 변경                                     |
 | label      | 이름이나 버전, 저작자 정보를 설정                            |
 
-### 참고 사이트
+## Docker Compose 
+- 도커 설정을 기재한 설정 파일을 이용해, 한 번에 여러 컨테이너를 생성, 실행, 폐기하는 기능 제공
+### 사용 방법
+1. 파이썬 런타임과 도커 컴포즈 설치
+   ```shell
+    sudo apt install -y python3-pip
+    sudo pip3 install docker-compose
+   ```
+### docker-compose.yml 작성
+- 주 항목 -> 이름 추가 -> 설정 순으로 작성한다고 생각
+  - 주 항목 : services(컨테이너 모음), networks, volumes
+  - 정의 내용 : image, ports, networks, volumes, environment, depends_on, restart
+```
+version: "3"
+services:
+  컨테이너_이름1:
+  컨테이너_이름2:
+networks:
+volumes:
+```
+- 주의점
+  - YAML 형식은 공백의 개수에 따라 의미가 달라짐 like python
+    - tab 사용불가
+  - 이름 뒤에는 콜론(:)을 꼭 붙일 것.
+  - 이어서 설정을 기재하려면 콜론 뒤에 공백이 하나 있어야 한다.
+    - 설정 사항이 여러 개라면 줄을 바꿔 하이픈(-)을 앞에 적고 들여쓰기를 맞춘다.
+    - 이 말은 즉슨, 앞에서 이름을 적을 때 들여쓰기 한 단을 '공백 두개'로 했다면 '공백 두개'를 더 들여써야 한다.
+  - #은 주석, 문자열은 '', "" 감싸기 
+
+## 문제상황과 해결방법
+- aws 서버에 ssh를 터미널에 띄어 연결하려고 했는데 연결이 되지 않았다.
+  - aws 서버 재부팅을 하고서 연결 했더니 되더라.
+- ec2 인스턴스를 통해 서버를 구축하고 있어. 인스턴스를 재부팅했는데도 이전에 설치한 docker가 내부에 남아 있어. 재부팅 하면 내역이 사라질 줄 알았는데 왜 남아있는거야
+  - ec2의 특성 
+    - EC2 인스턴스는 기본적으로 EBS(Elastic Block Store) 볼륨을 사용
+    - 재부팅은 인스턴스를 껐다 켜는 것과 유사한 동작으로, 인스턴스의 메모리와 CPU를 초기화하지만, EBS 볼륨에 저장된 데이터는 그대로 남아 있습니다.
+  - 결론 : EC2 인스턴스의 EBS 볼륨은 기본적으로 데이터를 지속시키기 때문에 재부팅해도 Docker와 같은 설치된 소프트웨어가 그대로 남아 있습니다. 인스턴스를 매번 초기화된 상태로 사용하고 싶다면 인스턴스 설정과 스토리지 옵션을 조정해야 합니다.
+  - 만약 인스턴스를 종료하면서 데이터도 삭제하고 싶다면, "Delete on Termination" 옵션을 사용해야 합니다. 이 경우 인스턴스를 종료할 때 EBS 볼륨도 삭제되어 데이터가 사라집니다.
+- apt 명령어를 실행하는데 `E: dpkg was interrupted, you must manually run 'sudo dpkg --configure -a' to correct the problem.` 에러 발생
+  - 리눅스 패키지 작업에 대한 이해가 필요함 : https://bradbury.tistory.com/227
+  - aws를 재부팅 하면서, 작업 중 중단이 생겨 에러가 발생 메뉴얼 대로 'sudo dpkg --configure -a'를 먼저 실행시켜 해결 가능
+
+
+## 참고 사이트
 - aws : https://bcp0109.tistory.com/356
 - docker 명령어 : https://docs.docker.com/reference/
