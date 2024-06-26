@@ -4,17 +4,19 @@ S2uJeong's Note
 ### 자격증
 - 💻 정보처리기사 ✔
   - 📁resource/engineerInformationProcessing
-- 💻 SQLD
+- 💻 SQLD ✔
   - 📁resource/sqld
 ### 아키텍처 
 - 📒 클린아키텍처 ✔
   - 24년 03월 ~ 04월 
   - 📁resource/cleanArchitecture 
 - 📒 헤드 퍼스트 디자인 패턴
-- 📒 실시간 데이터 파이프라인 아키텍처 - 앤드류 살티스 
+- 📒 실시간 데이터 파이프라인 아키텍처 - 앤드류 살티스 ✔
   - 📁resource/streamingDataArchitecture
-### 도커 & 쿠버네티스 ✔
-- 📒 그림과 실습으로 배우는 도커 & 쿠버네티스 - 오가사와라 시게타카
+- 📒 그림으로 공부하는 마이크로 서비스 구조 ✔
+  - 📁resource/msa
+### 도커 & 쿠버네티스 
+- 📒 그림과 실습으로 배우는 도커 & 쿠버네티스 - 오가사와라 시게타카 ✔
   - 24년 06월 18일 ~ 19일 
   - 📁resource/linux/docker_kubernetes
 
