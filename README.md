@@ -14,6 +14,7 @@ S2uJeong's Note
 - 📒 실시간 데이터 파이프라인 아키텍처 - 앤드류 살티스 ✔
   - 📁resource/streamingDataArchitecture
 - 📒 그림으로 공부하는 마이크로 서비스 구조 ✔
+  - 24년 6월 26일  
   - 📁resource/msa
 ### 도커 & 쿠버네티스 
 - 📒 그림과 실습으로 배우는 도커 & 쿠버네티스 - 오가사와라 시게타카 ✔
