@@ -16,6 +16,10 @@ S2uJeong's Note
 - 📒 그림으로 공부하는 마이크로 서비스 구조 ✔
   - 24년 6월 26일  
   - 📁resource/msa
+### 개발 방법론
+- 📒 테스트 주도 개발 시작하기 
+  - 24년 7월 3일 
+  - 📁resource/testDrivenDevelopment/startTDD.md
 ### 서버
 - 📒 그림과 실습으로 배우는 도커 & 쿠버네티스 - 오가사와라 시게타카 ✔
   - 24년 06월 18일 ~ 19일 
