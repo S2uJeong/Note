@@ -69,7 +69,7 @@
 - 상황 
   - 브랜치 전략은 `feat/` 에서 기능을 각자 개발하고, `main`에서 개발 완료된 코드를 합치고, `latest` 브랜치를 통해 배포 진행
   - 배포 후 latest 브랜치의 코드가 버그가 났다는 것을 인지하여 main에서 hotfix 브랜치를 따서 문제가 되는 부분만 고친 뒤, 병합 하길 원함
-  ![img.png](images/cherry_pick.png)
+  ![img.png](git_cherry_pick.png)
 - main과 latest를 병합해야만 main에 병합될 hotfix 브랜치 내용이 반영 되는데, main에 병합 된 다른 기능 들이 latest에 병합되면 안된다. 
 - 이런 상황에선, main에 hotfix를 병합한 커밋(체리)를 latest에서 체리픽하면 조건하에 버그를 고친 코드를 반영할 수 있다.
 
