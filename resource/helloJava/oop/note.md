@@ -96,6 +96,7 @@ public class Member {
 ### static 메서드
 - static 메서드는 내부 기능을 작성할 때, static 변수/메서드 만 사용할 수 있다.
 - 매개변수를 통해 객체의 참조값을 전달하면 정적 메서드 안에서 객체의 변수나 메서드를 사용할 수 있다. 
+- src/helloJava/tmp/StaicTest.java
 
 ## 상속
 
