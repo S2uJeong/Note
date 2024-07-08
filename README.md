@@ -27,7 +27,12 @@ S2uJeong's Note
 - 📒서버의 기초 - 키하시 마사히로
   - 24년 7월 3일
   - 📁resource/etc/server.md
-
+### 정신
+- 📒소프트웨어 장인 정신 ✔
+  - 24년 07월 06일 
+- 📒프로그래머스의 뇌
+  - 24년 07월 07일 
+  - 📁resource/etc/programmers_brain.md
 ### JAVA
 - 📒이것이 자바다
   - 📁resource/helloJava
