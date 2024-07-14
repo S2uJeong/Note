@@ -11,6 +11,7 @@ S2uJeong's Note
   - 24년 03월 ~ 04월 
   - 📁resource/cleanArchitecture 
 - 📒 헤드 퍼스트 디자인 패턴
+  - 24년 07월 15일 ~ 
 - 📒 실시간 데이터 파이프라인 아키텍처 - 앤드류 살티스 ✔
   - 📁resource/streamingDataArchitecture
 - 📒 그림으로 공부하는 마이크로 서비스 구조 ✔
