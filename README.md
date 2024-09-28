@@ -22,12 +22,15 @@ S2uJeong's Note
   - 24년 7월 3일 
   - 📁resource/testDrivenDevelopment/startTDD.md
 ### 서버
-- 📒 그림과 실습으로 배우는 도커 & 쿠버네티스 - 오가사와라 시게타카 ✔
+- 📒그림과 실습으로 배우는 도커 & 쿠버네티스 - 오가사와라 시게타카 ✔
   - 24년 06월 18일 ~ 19일 
   - 📁resource/linux/docker_kubernetes
 - 📒서버의 기초 - 키하시 마사히로 ✔
   - 24년 7월 3일
   - 📁resource/etc/server.md
+### 컴퓨터 사이언스
+- 📒웹/HTTP/네트워크 - 임지영 ✔
+  - 24년 9월 28일
 ### 정신
 - 📒소프트웨어 장인 정신 ✔
   - 24년 07월 06일 
@@ -40,3 +43,6 @@ S2uJeong's Note
   - 🟡to-do
     - 정규표현식 클래스 (547)
     - 스트림 (722~)
+## DataBase
+- JPA - 김영한
+- 관계형 데이터 모델링 프리미엄 가이드 - 김기창 
