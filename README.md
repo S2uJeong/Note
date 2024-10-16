@@ -21,6 +21,9 @@ S2uJeong's Note
 - 📒 테스트 주도 개발 시작하기 
   - 24년 7월 3일 
   - 📁resource/testDrivenDevelopment/startTDD.md
+- 📒 단위테스트 - 블라디미르 코리코프
+  - 24년 10월 ~ (중단) 어려움,,
+  - 📁 resource/testDrivenDevelopment/unitTesting.md
 ### 서버
 - 📒그림과 실습으로 배우는 도커 & 쿠버네티스 - 오가사와라 시게타카 ✔
   - 24년 06월 18일 ~ 19일 
