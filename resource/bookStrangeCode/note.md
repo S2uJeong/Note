@@ -180,3 +180,319 @@ int discountedPrice = price * rate // (o)
     - performance가 중요한 경우 : 대량의 데이터, 이미지 처리, 리소스 제약이 큰 임베디드
     - 불변이라면 값을 변경할 때 인스턴스를 새로 만들어야 하므로.
     - 스코프가 국소적인 경우 : 반복문 카운터 등
+
+# 5. 응집도
+
+모듈 내부에 있는 데이터와 로직 사이의 관계가 얼마나 강한지를 나타내는 지표
+
+응집도를 낮추는 요인들을 아래에서 살펴보자.
+
+### static 메서드 오용
+
+- 데이터와 관련 로직이 다른 클래스에 작성되게 함
+
+    ```java
+    // 주문을 관리하는 클래스
+    public OrderManager {
+    		static int add(int moneyAmount1, int moneyAmount2) {
+    				return moneyAmount1 + moneyAmount2;
+    		} 
+    ```
+
+- static 메서드는 인스턴스 변수를 사용할 수 없다. 이는 애초에 데이터와 데이터를 로직 사이에 괴리가 생긴 것.
+- 인스턴스 메서드인 척하는 static 메서드 주의 : 매개변수만을 이용하고, 필드를 사용하지 않는 메서드
+
+    ```java
+    public OrderManager {
+    	 private int discountRate; // 할인율 
+    		static int add(int moneyAmount1, int moneyAmount2) {
+    				return moneyAmount1 + moneyAmount2;
+    		} 
+    ```
+
+- 언제 static 메서드를 사용해야 하나
+  - 응집도의 영향을 받지 않는 경우 : 로그 출력 전용, 포맷 전환 전용, 팩토리 메서드
+
+### 초기화 로직 분산
+
+- public 생성자를 남발하면 로직이 분산 됨. private 생성자 + 팩토리 메서드 사용
+- 팩토리 클래스
+  - 객체 생성 메서드에 이름을 부여할 수 있어 가독성이 높아집니다.
+  - 객체 생성 과정이 캡슐화됩니다.
+  - 생성자 오버로딩 대신 메서드 이름으로 목적을 분명히 알 수 있습니다.
+
+    ```java
+    public class UserFactory {
+        // 정적 팩토리 메서드
+        public static User createAdmin(String name) {
+            return new User(name, "ADMIN");
+        }
+    
+        public static User createGuest(String name) {
+            return new User(name, "GUEST");
+        }
+    }
+    // main
+    User admin = UserFactory.createAdmin("Alice");
+    User guest = UserFactory.createGuest("Bob");
+    ```
+
+
+### 범용 처리 클래스 (Common/Util)
+
+꼭 필요한 경우가 아니면, 범용 처리 클래스는 만들지 말고, 객체 지향 설계의 기본으로 처리한다.
+
+횡단 관심사 (로그 출력, 오류 확인, 예외 처리, 디버깅, 동기화, 캐시, 분산 처리) 등은 범용 코드 ok
+
+### 결과를 리턴하는 데 매개변수 사용하지 않기
+
+- 데이터와 로직이 각자 다른 클래스에 있게 된다
+
+    ```java
+    class ActorManager {
+    		// 캐릭터 위치를 이동
+    		void shift(Location location, int shiftX, int shiftY) {
+    		      // 인스턴스를 매개변수로 전달받고, 이를 변경하고 있음 
+    		      // 그런데 데이터 조작 로직은 ActorManager에 있음 
+    		      location.x += shiftX;
+    		      location.y += shiftY;
+    		}
+    }
+    ```
+
+    ```java
+    class Location {  // 이와 같이 객체지향을 따라서 만들어주댜!
+    		final int x; 
+    		final int y;
+    		
+    		Location(final int x, final int y) {
+    				this.x = x; this.y = y;
+    		}
+    		
+    		Location(final int shiftX, final int shiftY) {
+    				final int nextX = x + shiftX;
+    				final int nextY = y + shiftY;
+    				return new Location(nextX, nextY);
+    		}
+    }
+    ```
+
+
+### 매개변수가 너무 많은 경우
+
+- 단일 책임이 아니어질 확률이 높고, 잘못된 값을 대입할 가능성이 높다
+- 의미 있는 단위는 모두 클래스로 만든다. : 매개변수에 있는 많은 기본 타입의 변수들을 모아 필드로 갖는 클래스를 만들어 활용
+
+
+# 6장. 조건분기
+
+### 중첩된 조건 분기
+
+- 조기리턴 : 조건을 만족하지 않는 경우 곧바로 리턴
+- else 구문 특히 조기 리턴으로 처리
+
+### swicth 조건문 중복
+
+- switch 조건문 한 번에 작성 → 클래스가 거대해지면 인터페이스 사용
+
+### interface를 이용한 조건 제거
+
+|                 | Do not            | Do                   |
+| --------------- | ----------------- | -------------------- |
+| 분기            | if, switch 조건문 | 인터페이스 설계 사용 |
+| 분기마다의 처리 | 로직을 그냥 작성  | 클래스 사용          |
+
+### Map을 사용해 고도화
+
+### 예시 : 회원 등급 산정 로직
+
+```java
+/**
+* @return 골드 회원이라면 ture
+* @param history 구매이력
+*/
+boolean isGoldCustomer(PurchaseHistory history) {
+		if (1_000_000 <= history.totalAmount) {
+			if (10 <= history.purchaseFrequencyPerMonth) {
+					if (history.returnRate <= 0.001) {
+							return true;
+					}
+			}
+		}
+	return false;
+}
+
+/**
+* @return 실버회원이라면 ture
+* @param history 구매이력
+*/
+boolean isSilverCustomer(PurchaseHistory history) {
+		if (10 <= history.purchaseFrequencyPerMonth) {
+				if (history.returnRate <= 0.001) {
+						return true;
+				}
+		}
+	return false;
+}
+```
+
+1. 정책 패턴으로 조건 집약
+  - 정책 패턴 : 조건을 부품처럼 만들고, 부품으로 만든 조건을 조합해서 사용하는 패턴
+  - 하나하나의 규칙 (판정 조건)을 나타내는 인터페이스 제작
+  - if문이 정책클래스에만 사용되어 로직이 단순해짐
+  - [상세 코드](https://github.com/S2uJeong/Note/blob/d25addee49997b1f5f0859a66590c0fac4f02784/src/bookStrangeCode/notUseSwitch)
+
+      ```java
+      
+      interface ExcellentCustomerRule {
+        // @return 조건을 만족하는 경우 true
+          boolean ok(final PurchaseHistory history);
+      }
+      
+      // 구매 금액 규칙 
+      class GoldCustomerPurchaseAmountRule implements ExcellentCustomerRule  {
+              public boolean ok(final PurchaseHistory history) {
+                      return 1_000_000 <= history.totalAmount;
+              }
+      }
+      // 구매 빈도 규칙
+      class PurchaseFrequencyRule implements ExcellentCustomerRule  {
+              public boolean ok(final PurchaseHistory history) {
+                      return 10<= history.purchaseFrequencyPerMonth;
+              }
+      }
+      // 반품률 규칙
+      class ReturnRateRule implements ExcellentCustomerRule  {
+              public boolean ok(final PurchaseHistory history) {
+                      return 0.001 >= history.returnRate;
+              }
+      }
+      ```
+
+  - 정책 클래스 : `add()` 로 규칙을 집약하고, `complyWithAll()` 내부에서 규칙을 모두 만족하는지 판정
+
+      ```java
+      public class ExcellentCustomerPolicy {
+          private final Set<ExcellentCustomerRule> rules; // rule을 세분화 한뒤, 필드를 rule list 만들어 해당하는 것 다 지켜야 한다는 로직 만든게 인상적
+      
+          public ExcellentCustomerPolicy() {
+              this.rules = new HashSet<>();
+          }
+      
+          /**
+           * 규칙 추가
+           * @param rule 규칙
+           */
+          void add(final ExcellentCustomerRule rule) {
+              rules.add(rule);
+          }
+      
+          /**
+           * @param history 구매이력
+           * @return 규칙을 모두 만족하는 경우 true
+           */
+          boolean complyWithAll(final PurchaseHistory history) {
+              for (ExcellentCustomerRule each : rules) {
+                  if (!each.ok(history)) return false;
+              }
+              return true;
+          }
+      }
+      ```
+### 플래그 매개변수 사용하지 마!
+
+```java
+/**
+* 플래그 변수 사용한 안 좋은 예시 : damage(true, damageAmount)
+*/
+void damage(boolean damageFlag, int damageAmount) {
+	if (damageFlag == true) {
+			// 물리 대미지 (히트포인트 기반 대미지)
+			member.hitPoint -= damageAmount;
+			if (0 < member.hitPoint) return;
+			
+			member.hitPoint = 0;
+			member.addState(StateType.dead);
+	}
+	else {
+			// 마법 대미지 (매직포인트 기반 대미지)
+			member.magicPoint -= damageAmount;
+			if (0 < member.magicPoint) return;
+			member.magicPoint = 0;
+	}
+}
+```
+
+```java
+// bool이 아닌 int형 플래그도 주의
+void execute(int processNumber) {
+	if (processNumber = 0) {
+			// 계정 등록 처리
+	} else if {
+			// 주문 처리 
+	} else ...
+}
+```
+
+1. 메서드 분리
+
+    ```java
+    void hitPointDamage(final int damageAmount) }
+          member.hitPoint -= damageAmount;
+    			if (0 < member.hitPoint) return;
+    			
+    			member.hitPoint = 0;
+    			member.addState(StateType.dead);
+    }
+    
+    void magicPointDamage(final int damageAmount) {
+         member.magicPoint -= damageAmount;
+    			if (0 < member.magicPoint) return;
+    			member.magicPoint = 0;
+    }
+    ```
+
+2. 기능 전환은 전략패턴으로 구현
+
+    ```java
+    interface Damage {
+    	  void execute(final int damageAmount);
+    }
+    
+    class HitPointDamage implements Damage  {
+    
+    		void execute(final int damageAmount) {
+    				member.hitPoint -= damageAmount;
+    				if (0 < member.hitPoint) return;
+    				
+    				member.hitPoint = 0;
+    				member.addState(StateType.dead);
+    		}
+    }
+    
+    class MagicPointDamage implements Damage  {
+    
+    		void execute(final int damageAmount) {
+    				member.magicPoint -= damageAmount;
+    				if (0 < member.magicPoint) return;
+    				member.magicPoint = 0;
+    		}
+    }
+    ```
+
+3. enum과 Map 활용
+
+    ```java
+    enum DamageType {
+    		hitPoint,
+    		magicPoint
+    }
+    
+    private final Map<DamageType, Damage> damages;
+    
+    void applyDamage(final DamageType type, final int damageAmoun) {
+    		final Damage damage = damages.get(type);
+    		damage.execute(damageAmount);
+    }
+    // 호출 하는 형태 : applyDamage(DamageType.magicPoint, damageAmount);
+    ```
