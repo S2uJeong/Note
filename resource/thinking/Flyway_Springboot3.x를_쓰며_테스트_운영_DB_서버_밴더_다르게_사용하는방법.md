@@ -3,7 +3,9 @@
 ### 미리 결론
 
 - 테스트와 운영 애플리케이션의 DB 종류를 다르게 쓰고 있어서 마이그레이션 쿼리문에 구문 오류 에러가 뜬다면
+
 - 설정 파일에 placeholders 기능과 migration 폴더 세분화를 통해 DB별 쿼리 파일을 만들어 분기해주어 해결한다!
+
 - 신기술은 ChatGPT에 물어보지 말고 동작원리를 최대한 이해하고, stackOverFlow나 공식문서를 확인하자!
 
 
@@ -54,7 +56,7 @@
 
 
 3. test 하위에 resources 폴더 만들어서 시도 (spring) => 실패
-   ![화면 캡처 2024-12-20 012035](C:/Users/sj9802/Desktop/%ED%99%94%EB%A9%B4%20%EC%BA%A1%EC%B2%98%202024-12-20%20012035.png)
+   ![image-20241220013311779](https://raw.githubusercontent.com/S2uJeong/blogImages/main/images/image-20241220013311779.png)
 
    위의 공식문서를 참고하고 혹시나 되나 하고 시도해봤는데, 이 방법은 그저 테스트 data를 넣기 위한 방법이지, test db에 따로 쿼리 파일을 지정해주는 용도로 설명된 것이 아닙니다.
 
