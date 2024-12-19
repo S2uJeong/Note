@@ -56,7 +56,7 @@
 
 
 3. test 하위에 resources 폴더 만들어서 시도 (spring) => 실패
-   ![image-20241220013311779](https://raw.githubusercontent.com/S2uJeong/blogImages/main/images/image-20241220013311779.png)
+   ![2](https://raw.githubusercontent.com/S2uJeong/blogImages/main/images/2.png)
 
    위의 공식문서를 참고하고 혹시나 되나 하고 시도해봤는데, 이 방법은 그저 테스트 data를 넣기 위한 방법이지, test db에 따로 쿼리 파일을 지정해주는 용도로 설명된 것이 아닙니다.
 
