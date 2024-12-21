@@ -496,3 +496,352 @@ void execute(int processNumber) {
     }
     // 호출 하는 형태 : applyDamage(DamageType.magicPoint, damageAmount);
     ```
+
+# 7장. 컬렉션 : 중첩을 제거하는 구조화 테크닉
+
+- 배열, List 같은 컬렉션을 따라다니는 악마 퇴치!
+
+### 응집도가 낮은 컬렉션 처리
+
+→ 일급 컬렉션 패턴을 사용해 해결 : 컬렉션과 관련된 로직을 캡슐화하는 디자인 패턴이다.
+
+- 컬렉션 자료형의 인스턴스 변수
+- 컬렉션 자료형의 인스턴스 변수에 잘못된 값이 할당되지 않게 막고, 정상적으로 조작하는 메서드
+
+### 외부로 컬렉션을 전달할 때 변경 막기
+
+`List.unmodifiableList()` 함수 이용해서 컬렉션을 return했을 때, 해당 리턴 자료를 수정하지 못 하게 한다.
+
+# 8장. 강한 결합
+
+## 단일 책임 원칙
+
+- 결합에 있어 제일 주요하게 인식해야 할 개념
+- 단일 책임 원칙 기반으로 분리할 때 주의 할 점은, 책무를 생각하지 않고 로직의 중복을 제거한다고 일반화 하는 것을 주의 해야 함.
+  - 예를 들어, 두 가격 개념 (여름 할인 가격, 정가)를 두 클래스로 나눴을 때, 할인율 빼곤 price를 산정하는 로직이 같더라도 함부로 일반화 할 수 없다.
+  - 왜냐하면 정률제 할인을 도입하게 되면 관계를 다시 고쳐야 한다.
+  - 코드 중복을 기준으로 생각하는 것이 아니라 비즈니스 개념 관점으로 생각하여 일반화해야 한다.
+
+
+
+## 다양한 결합과 대처 방법
+
+### 01. 상속은 강한 결합을 만드므로 컴포지션을 활용하라.
+
+- “`super.method()` + 상속 받는 클래스의 개별 로직”은 슈퍼클래스의 변화를 주목하게 한다.
+- 컴포지션 : private 인스턴스 변수로 갖고 사용하는 것.
+
+  ![상속과컴포지션.png](https://raw.githubusercontent.com/S2uJeong/blogImages/main/images/상속과컴포지션.png)
+
+
+```java
+Class BasicClass extends SuperClass {
+   @Override
+   method() {
+       super.method();
+       print("hello BasicClass");
+   }
+}
+
+class BasicClass {
+    private final SuperClass superClass;
+    
+    method() {
+	    superClass.method();
+	    print("hello BasicClass");
+    }
+}
+```
+
+### 02. 인스턴스 변수별로 클래스 분별이 가능하게 하라
+
+![클래스분리.png](https://raw.githubusercontent.com/S2uJeong/blogImages/main/images/클래스분리.png)
+
+- before) 책무가 다른 여러 메서드가 포함되어 있는 클래스
+
+    ```java
+    class Util {
+       private int reservationId;  // 상품예약 id
+       private ViewSettings viewSettings;  // 화면 표시 설정
+       
+       void cancelReservation() {
+    	   // reservationId를 사용한 예약 취소 처리
+       }
+       
+       void darkMode() {
+    		 // viewSettings를 사용한 다크 모드 표시 전환 처리 
+       }
+    }
+    ```
+
+- after) 책무 별로 클래스를 분리
+
+    ```java
+    class Reservation {
+    	private final int reservationId;
+    	void cancle() {
+    	}
+    }
+    
+    class ViewCustomizing {
+    	private final ViewSettings viewSettings; 
+    	void darkMode() {
+    	}
+    }
+    ```
+
+
+### 03. 클래스 public 사용 지양
+
+- ‘패키지’ 개념을 잘 활용하자. 본디 패키지는 밀접한 클래스끼리 응집하게 설계하도록 유도 + default private
+- public을 남발하면 영향 범위가 확대됨
+
+### 04. private 메서드가 너무 많다는 것은 책임이 너무 많다는 것
+
+- 책임이 다른 메서드는 다른 클래스로 분리
+
+### 05. 높은 응집도를 오해하면 강한 결합이 생긴다.
+
+- 높은 응집도란 관련이 깊은 데이터와 논리를 한 곳에 모은 구조이다.
+- 정말 관련있는 ‘개념’끼리 모인건지 재점검해야 한다.
+- before ) 관련이 깊지 않은 개념들이 한 클래스에 모여 있음.
+
+    ```java
+    
+    class SellingPrice {
+      ...
+      // 판매 수수료 계산
+      int calcSellingCommision() {
+    	  return (int)(amount * SELLING_COMMISION_RATE);
+      }
+      // 배송비 계산
+      int calcDeliveryCharge() {
+    	  return DELIVERY_FREE_MIN <= amount ? 0 : 5000;
+      }
+      // 추가할 쇼핑 포인트 계산
+      int calcShoppingPoint() {
+        return (int)(amount * SHOPPING_POINT_RATE);
+      }
+    } 
+    ```
+
+- after) 관련 있는 개념끼리 분리한 클래스
+
+    ```java
+    class SellingCommision {
+      private static final float SELLING_COMMISION_RATE = 0.05f;
+      final int amount;
+      
+      SellingCommision(final SellingPrice price) {
+    		  amount = (int)(price.amount * SELLING_COMMISION_RATE);
+      }
+    }
+    
+    class DeliveryCharge {
+      private static final int DELIVERY_FREE_MIN = 20000;
+      final int amount;
+      
+      DeliveryCharge(final SellingPrice price) {
+    		  amount =  DELIVERY_FREE_MIN <= price.amount ? 0 : 5000;
+      }
+    }
+    
+    class ShoppingPoint {
+      private static final floatSHOPPING_POINT_RATE= 0.01f;
+      final int value;
+      
+      ShoppingPoint (final SellingPrice price) {
+    		  value = (int)(price.amount * SHOPPING_POINT_RATE);
+      }
+    }
+    ```
+
+
+### 06. 거대 데이터 클래스
+
+- 클래스를 “데이터를 편리하게 운반하는 역할”로 인식하면 안된다.
+- 이러면 수많은 유스케이스에서 사용하게 된다.
+- 각각의 유스케이스에서 필요한 데이터만 접근하고 사용하게 구성해라.
+
+
+# 9장. 설계의 건전성을 해치는 여러 악마
+
+### 전역 변수 개념을 띄는 것을 주의한다.
+
+- 데이터 클래스 or `public static`
+- 어떤 시점에 어디에서 값을 변경했는지 알기 어려워 진다. 동기화 문제도 있다.
+
+### null이 아니게 null을 표현하자.
+
+- null을 리턴하거나 전달하지 말자.
+- 예시) ‘장비하지 않음’을 null이 아니게 표현
+
+    ```java
+    class Equipment {
+        static final Equipment EMPTY = new Equipment("장비 없음", 0,0,0);
+        
+        final String name;
+        final int Price;
+        final int defence;
+        final int magicDefence;
+    
+        Equipment(String name, int price, int defence, int magicDefence) {
+            if (name.isEmpty()) {
+                throw new IllegalStateException("잘못된 이름입니다.");
+            }
+            this.name = name;
+            Price = price;
+            this.defence = defence;
+            this.magicDefence = magicDefence;
+        }
+    }
+    
+     // 활용 방법 : 모든 장비 해제
+    void takeOffAllEquipments() {
+    		head = Equipment.EMPTY;
+    		body = Equipment.EMPTY;
+    		arm = Equipment.EMPTY; 
+    }
+    ```
+
+
+### 설계 질서를 파괴하는 메타 프로그래밍
+
+- 메타 프로그래밍 : 프로그램 실행 중에 해당 프로그램 구조 자체를 제어하는 프로그래밍
+- 자바에서 메타프로그래밍을 활용해 클래스 구조를 읽고 쓸 때는 리플렉션 API를 사용한다.
+- 리플랙션을 남용하면 ‘잘못된 상태로부터 클래스를 보호하는 설계’와 ‘영향 범위를 최대한 좁게 만드는 설계’가 아무런 의미를 갖지 못하게 된다.
+
+    ```java
+    public class Level {
+        private static final int MIN = 1;
+        private static final int MAX = 99;
+        final int value;
+    
+        public Level(int value) {
+            if (value < MIN || MAX < value) {
+                throw new IllegalArgumentException();
+            }
+            this.value = value;
+        }
+    
+        // 초기 레벨 리턴
+        static Level initialize() {
+            return new Level(MIN);
+          }
+    }
+    
+    /**
+     * Level 클래스는 설계 규칙을 잘 만들어 작성했지만,
+     * 실행할 때 리플렉션을 사용해서 규칙이 다 깨져버렸다.
+     *
+     * 객체 필드 검증이 적용 안되고 있음
+     */
+    public class Main {
+        public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
+            Level level = Level.initialize();
+            System.out.println(level.value);
+    
+            Field field = Level.class.getDeclaredField("value");
+            field.setAccessible(true);
+            field.setInt(level, 999); // MAX가 99인데,,
+            System.out.println(level.value);
+        }
+    }
+    ```
+
+
+- 자료형의 장점을 살리지 못하는 하드코딩로 오류를 야기한다.
+  - 필드명을 변경하면 `class.getDeclaredField("value")` 을 사용한 것이 문제가 된다.
+  - 보통 필드명 변경 시, IDE 도구가 사용된 모든 곳에 자료형을 기준으로 자동으로 같이 바꿔준다.
+  - 하지만 위의 코드는 단순 `string` 으로 value를 찾았기 때문에 함께 바뀌지 않는다.
+
+### 기술 중심 패키징 지양
+
+- MVC를 예시로 하자면, `models, views, controllers` 로 패키징하는 것이 기술 중심 패키징
+- 비즈니스 개념을 기준으로 폴더화 하자
+
+    ```java
+    - 재고
+    		- 재고_유스케이스.java
+    		- 발주_엔티티.java
+    		- 입고_엔티티.java
+    - 주문 
+    		- 주문_유스케이스
+    		- 장바구니_엔티티.java
+    ```
+
+
+# 10장. 이름 설계 : 구조를 파악할 수 있는
+
+- 비즈니스 목적 중심 이름 설계를 해야 한다.
+- 관심사의 분리를 생각하고, 비즈니스 목적에 맞게 이름을 붙이는 것은
+- 결합이 느슨하고 응집도가 높은 구조를 만드는데 중요한 역할을 한다.
+- 상품 →  예약/주문/재고/발송 + “상품”
+
+### 목적 중심 이름 설계하기
+
+- 최대한 구체적이고, 의미 범위가 좁고, 특화된 이름 선택
+- 존재가 아니라 목적을 기반으로 하는 이름 생각
+
+    | 존재 기반 | 목적 기반 |
+    | --- | --- |
+    | 주소  | 발송지, 배송지, 업무지 |
+    | 금액 | 청구 금액, 소비세액, 연체 보증료, 캠페인 할인 금액 |
+- 어떤 관심사가 있는지 분석
+- 소리 내어 이야기해 보기
+- 이용 약관 읽어 보기
+- 다른 이름으로 대체할 수 없는지 검토
+- 결합이 느슨하고 응집도가 높은 구조인지 검토
+
+### 이름 설계 시 주의 사항
+
+- 이름의 차이를 설명 할 때 수식어를 붙이게 되면,
+- 이름을 다르게 지어 구분하기 보단 클래스로 만들어서 설계해보자.
+
+# 11장. 주석
+
+- 코드를 설명하는 주석을 쓰지 말자 → 주석을 유지 보수하기 어려워진다.
+- 주석을 달게 되면 이름을 대충 짓게 되어도 설명이 가능하게 된다고 생각하여 이름 설계를 소홀히 한다.
+
+### 주석을 작성해야 할 때
+
+- [code](https://github.com/S2uJeong/Note/blob/8196cfea2484b1da6ac400ef3a86f7d812dd001c/src/bookStrangeCode/goodComment)
+- 의도와 사양 변경 시 주의 사항 작성
+
+    ```java
+    class Member {
+        private final States states;
+    
+        Member(States states) {
+            this.states = states;
+        }
+    
+        // 고통받는 상태일 때 true를 리턴
+        boolean isPainful() {
+            // 이후 사양 변경으로 표정 변화를
+            // 일으키는 상태를 추가할 경우
+            // 이 메서드에 로직을 추가한다.
+            if (states.contains(StateType.POISON) ||
+                    states.contains(StateType.PARALYZED) ||
+                    states.contains(StateType.FEAR)) {
+                return true;
+            }
+            return false;
+        }
+    }
+    ```
+
+- 문서화를 대비한 메서드 단위 주석
+
+    ```java
+    /**
+    * 상태 리스트에 상태를 추가한다.
+    * @param state 캐릭터 상태
+    * @throws IllegalArgumentException 상태에 null이 들어오면 발생
+    */
+    public void addState(State state) {
+      if (state == null) throw new IllegalArgumentException("상태에 올바르지 않은 값이 들어왔습니다.");
+      stateSet.add(state);
+    }
+    ```
+    ![주석활용.png](https://raw.githubusercontent.com/S2uJeong/blogImages/main/images/image-20241221174012829.png)
