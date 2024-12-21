@@ -181,7 +181,7 @@ int discountedPrice = price * rate // (o)
     - 불변이라면 값을 변경할 때 인스턴스를 새로 만들어야 하므로.
     - 스코프가 국소적인 경우 : 반복문 카운터 등
 
-# 5. 응집도
+# 5장. 응집도
 
 모듈 내부에 있는 데이터와 로직 사이의 관계가 얼마나 강한지를 나타내는 지표
 
@@ -283,6 +283,47 @@ int discountedPrice = price * rate // (o)
 - 단일 책임이 아니어질 확률이 높고, 잘못된 값을 대입할 가능성이 높다
 - 의미 있는 단위는 모두 클래스로 만든다. : 매개변수에 있는 많은 기본 타입의 변수들을 모아 필드로 갖는 클래스를 만들어 활용
 
+### 메서드 체인
+
+```java
+/**
+* 갑옷 입기
+* @param memberId 장비를 변경하고 싶은 멤버의 ID
+* @param newArmor 입을 갑옷
+*/
+void equipAmor(int memberId, Armor newAmor) {
+   if(party.members[memberId].equipments.canChage) {
+   	  party.members[memberId].equipments.armor = newAmor;
+   }
+}
+
+```
+
+- 이런 로직은 응집도를 낮춘다.
+-  amor를 할당하는 코드는 어디에서나 있을 수 있기에 저런 메서드 체인 코드가 여러 곳에 중복될 가능성이 있다.
+
+```java
+class Equipmemts {
+	private boolean canChange;
+	private Equipment head;
+	private Equipment armor;
+	private Equipment arm;
+    
+	public Equipments() {
+        this.canChange = true; // Default state allows changes
+    }
+	void equipAmor(final Equipment newArmor) {
+       if(canChange) {
+          armor = newArmor;
+        }
+    }
+}
+
+```
+
+- 인스턴스 변수를 pricate로 변경해서 접근 할 수 없게 하고
+- 인스턴스 변수에 대한 제어는 외부에서 메서드로 명령하는 형태로 만든다.
+- 상세한 판단과 제어는 명령을 받는 쪽에서 담당한다.
 
 # 6장. 조건분기
 
@@ -499,14 +540,71 @@ void execute(int processNumber) {
 
 # 7장. 컬렉션 : 중첩을 제거하는 구조화 테크닉
 
-- 배열, List 같은 컬렉션을 따라다니는 악마 퇴치!
+### 응집도가 낮은 컬렉션 이란
 
-### 응집도가 낮은 컬렉션 처리
+```java
+// 필드 맵과 관련된 제어를 담당하는 클래스
+class FieldManager {
+    // 멤버를 추가 한다.
+    void addMember(List<Member> members, Member newMember) {
+        if (members.stream().antMatch(member -> member.id == newMember.id)) {
+            throw new RumtimeException("이미 존재하는 멤버입니다.");
+        }
+        if (members.size() == MAX_MEMBER_COUNT) {
+            throw new RumtimeException("이 이상 멤버를 추가할 수 없습니다.");
+        }
+        members.add(newMember);
+    }
+    // 파티 멤버가 1명이라도 존재하면 true를 리턴
+    boolean partyIsAlive(List<Member> members) {
+        return members.stream().anyMatch(member -> member.isAlive());
+    }
+}
+```
 
-→ 일급 컬렉션 패턴을 사용해 해결 : 컬렉션과 관련된 로직을 캡슐화하는 디자인 패턴이다.
+- 필드맵 맵 말고도 멤버를 추가하는 시점이 생길 수 있는데, 이때 중복된 코드들이 생기게 됨.
 
-- 컬렉션 자료형의 인스턴스 변수
-- 컬렉션 자료형의 인스턴스 변수에 잘못된 값이 할당되지 않게 막고, 정상적으로 조작하는 메서드
+  ```java
+  class SpecialEventManager {
+       void addMember(List<Member> members, Member newMember) {
+       	members.add(newMember);
+       }
+  }
+  ```
+
+- 이처럼 컬렉션과 관련된 작업을 처리하는 코드가 여기저기에 구현된 가능성이 높아지며 응집도가 낮아진다.
+
+### 일급 컬렉션
+
+- 컬렉션과 관련된 로직을 캡슐화하는 디자인 패턴
+
+- 일급 클래스에 있어야 할 것
+
+  - 컬렉션 자료형의 인스턴스 변수
+
+  - 인스턴스 변수에 잘못된 값이 할당되지 않게 막고, 정상적으로 조작하는 메서드
+
+- 위의 잘못된 예시를 `List<member> -> Party` 개념으로 일급컬렉션으로 바꿔 설계해보자.
+  ```java
+  // 리스트 자료형의 인스턴스 변수를 갖는 클래스 
+  class Party{
+  private final List<Member> members;
+  Party() {
+  members = new ArrayList<Member>();
+  }
+  Party add(final Member newMember) {
+  List<Member> adding = new ArrayList<>(members);
+  members.add(newMember);
+  return new Party(adding);
+  }
+  
+      // Party 관련 검증, 확인 등의 로직... : isAlive(), isFull(), exists()
+      
+      List<Member> members() {
+          return members.unmodifiableList(); // 외부에서 리스트를 조작하지 못하게 막는다.
+      }
+  }
+  ```
 
 ### 외부로 컬렉션을 전달할 때 변경 막기
 
@@ -845,3 +943,340 @@ class BasicClass {
     }
     ```
     ![주석활용.png](https://raw.githubusercontent.com/S2uJeong/blogImages/main/images/image-20241221174012829.png)
+
+
+# 12장. 메서드 : 좋은 클래스에는 좋은 메서드가 있다.
+
+### 반드시 현재 클래스의 인스턴스 변수 사용하기
+
+- 인스턴스 변수를 안전하게 조작하도록 메서드를 설계하면, 클래스 내부가 정상적인 상태인지 보장할 수 있다.
+
+- 다른 클래스의 인스턴스 변수 사용하지 않기 -> 응집도 낮아짐
+
+- 다른 클래스의 인스턴스 변수를 변경하는 메서드를 작성하고 싶다면, 변경된 내용을 다루는 새로운 인스턴스를 생성하고 이를 리턴하는 형태로 구현한다.
+
+- 예시
+
+  - `Person` 클래스의 `withUpdatedAge` 메서드는 기존 객체를 수정하지 않고, 변경된 나이를 반영한 새로운 객체를 반환
+
+    `Team` 클래스의 `withNewLeader` 메서드는 기존 객체를 수정하지 않고, 새로운 리더를 반영한 새로운 팀 객체를 반환
+
+  - `Team` 클래스는 `Person` 클래스의 필드에 직접 접근하지 않고, `Person` 객체 전체를 관리.
+  - 변경된 상태를 다루는 새로운 인스턴스를 생성하고 반환하여 기존 객체를 안전하게 유지
+
+  ```java
+  class Person {
+      private final String name;  // 불변 인스턴스 변수
+      private final int age;      // 불변 인스턴스 변수
+      // 생성자
+      public Person(String name, int age) {
+          if (name == null || name.isBlank() || age < 0) {
+              throw new IllegalArgumentException("Invalid input values");
+          }
+          this.name = name;
+          this.age = age;
+      }
+  
+      // 인스턴스 변수를 안전하게 조작하는 메서드
+      public Person withUpdatedAge(int newAge) {
+          if (newAge < 0) {
+              throw new IllegalArgumentException("Age must be non-negative");
+          }
+          // 새로운 인스턴스를 생성하여 변경된 내용을 반영
+          return new Person(this.name, newAge);
+      }
+  }
+  
+  class Team {
+      private final String teamName;
+      private final Person leader;
+      // 생성자 생략..
+      // 인스턴스 변수 변경 -> 새로운 인스턴스를 생성하고 반환
+      // `Person` 클래스의 필드에 직접 접근하지 않고, `Person` 객체 전체를 관리.
+      public Team withNewLeader(Person newLeader) {
+          if (newLeader == null) {
+              throw new IllegalArgumentException("Leader cannot be null");
+          }
+          return new Team(this.teamName, newLeader);
+      }
+  }
+  ```
+
+
+
+### 불변을 활용해서 예상할 수 있는 메서드 만들기
+
+### 묻지 말고 명령하라
+
+- 메서드 체인같이 줄줄히 호출하는 것을 지양하라는 것
+- 상세한 로직은 호출하는 쪽이 아니라, 호출되는 쪽에 구현
+
+### 커맨드/쿼리 분리
+
+### 매개변수 관련 규칙
+
+- 불변 매개변수로 만들기
+- 플래그 매개변수 사용하지 않기
+- null로 전달하지 않기 : null에 의미 부여 하지 않기
+- 출력 매개변수로 사용하지 않기
+- 매개변수는 최대한 적게, 많아진다면 하나의 클래스로 만드는 방법 검토
+
+### 리턴 값
+
+- 자료형을 통해 리턴 값의 의도 나타내기
+- null 리턴하지 않기
+
+
+
+# 13장. 모델링 : 클래스 설계의 토대
+
+- 모델 : 동작 원리와 구조를 간단하게 설명하기 위해, 사물의 특징과 관계를 그림으로 나타낸 것
+- 모델링 : 모델을 만드는 활동
+
+### 목적별로 모델링하기
+
+- User가 아닌 사용자, 재고 담당자 등의 세분화
+- User, Product와 같은 이름은 물리적인 세부 사항은 무시하고 개념적인 측면만 투영한 모델
+- 이 처럼 정보시스템에서는 `현실 세계에 있는 물리적인 존재`와 `정보 시스템에 있는 모델`이 1:N로 대응되는 경우가 많다.
+- 모델은 대상이 아니라 목적 달성의 수단
+
+### 모델 설계 과정
+
+- 해당 모델이 달성하려는 목적 모두 찾기
+- 목적별로 모델링을 다시 수정
+- 목적 중심 이름 설계를 기반으로 모델에 이름을 붙인다
+- 모델에 목적 이외의 요소가 들어가 있다면 다시 수정
+
+### 모델과 구현
+
+- 모델은 구조를 단순화 한 것이므로, 모델을 기반으로 클래스를 설계하며 수정해 나가야 한다.
+- 모델 != 클래스 , 모델 하나는 여러 개의 클래스로 구현된다.
+
+
+
+# 14장. 리팩터링
+
+### 과정을 순서대로 보며 감 익혀보자
+
+1. if 중첩을 제거 : 조기 retutn 사용
+
+   ```java
+   PurchasePointPayment(final Customer customer, final Comic comic) {
+       if (!customer.isEnabled()) {
+           throw new IllgalArgumentException("유효하지 않은 계정입니다.")
+       }
+       customerId = customer.id;
+       if (!comic.isEnabled()) {
+           throw new IllgalArgumentException("유효하지 않은 계정입니다.")
+       }
+       comicId = comic.id;
+       
+       consumptionPoint = comic.currentPurchasePoint;
+       paymentDateTime = LocalDateTime.now();
+   }
+   ```
+
+
+
+2. 의미 단위로 로직 정리
+
+  - 조건으로 검증하는 부분과 대입하는 부분으로 나눠서 정리
+
+   ```java
+   PurchasePointPayment(final Customer customer, final Comic comic) {
+       if (!customer.isEnabled()) {
+           throw new IllgalArgumentException("유효하지 않은 계정입니다.")
+       } 
+       if (!comic.isEnabled()) {
+           throw new IllgalArgumentException("유효하지 않은 계정입니다.")
+       }
+       
+       customerId = customer.id;
+       comicId = comic.id;
+       consumptionPoint = comic.currentPurchasePoint;
+       paymentDateTime = LocalDateTime.now();
+   }
+   ```
+
+3. 조건을 읽기 쉽게 하기
+
+  - `!customer.isEnabled()` 와 같은 논리 부정 연산자를 사용하면 가독성이 떨어진다.
+  - 대신 `isDisabled()` 를 사용한다.
+
+4. 의미 없이 쓴 로직을 메서드로 선언하여 사용
+
+### 테스트 코드를  사용한  리팩터링 흐름
+
+1. 이상적인 구조의 클래스 기본 형태를 어느 정도 잡는다
+2. 이 기본 형태를 기반으로 테스트 코드를 작성한다.
+3. 테스트를 실패시킨다.
+4. 테스트를 성공시키기 위해 최소한의 코드를 작성한다
+5. 기본 형태의 클래스 내부에서 리팩터링 대상 코드를 호출한다.
+6. 테스트가 성공할 수 있도록, 조금씩 로직을 이상적인 구조로 리팩터링
+
+### 불확실한 사양을 이해하기 위한 분석 방법
+
+- 문서화 테스트
+
+  - 메서드에 Test를 통해 입력 값의 변화에 따라 어떤 리턴이 나오는지 일일이 확인.
+
+- 스크래칭 리팩터링
+
+  - 로직의 의미와 구조를 분석하기 위해 시험 삼아 리팩터링 하는 것
+  - 과정
+    1. 대상 코드를 리포지터리에서 체크아웃 한다.
+    2. 코드를 리팩터링 한다.
+    3. 분석한다.
+
+  - 코드를 리팩터링 하는 이유는
+    - 코드의 가독성이 좋아져 로직의 사양을 이해할 수 있게 된다.
+    - 이상적인 구조가 보인다. 어느 범위를 메서드 또는 클래스로 끊어야 좋을지 보인다.
+    - 즉, 리팩터링의 목표가 조금씩 보인다
+    - 쓸데없는 코드(데드 코드)가 보인다.
+    - 테스트 코드를 어떻게 작성해야 할 지 보인다.
+
+
+
+### IDE의 리팩터링 기능
+
+- 이름 변경
+- 메서드 추출
+
+### 리팩터링 시 주의 사항
+
+- 기능 추가와 리팩터링 동시에 하지 않기
+  - 이후에 버그가 발생했을 때,
+  - 기능 추가로 버그가 발생한 것인지, 리팩토링으로 버그가 발생한 것인지 분석하기 힘들어진다.
+- 작은 단계로 실시하기
+  - 커밋은 어떻게 리팩터링했는지 차이를 알 수 있는 단위로 한다.
+  - 예를 들어 메서드 이름 변경과 로직 이동을 했다면, 커밋을 따로따로 구분한다.
+- 불필요한 사양은 제거 고려하기
+  - 코드에 버그가 있거나 다른 사양과 모순되는 점이 있다면 리팩터링 해도 바로잡기 힘들다
+  - 따라서 리팩터링 전에 불필요한 사양이 있는지, 사양을 다시 확인하는 것도 좋다.
+  - 불필요한 사양과 코드를 미리 제거할 수 있다면, 더 쾌적하게 리팩터링 할 수 있다.
+
+# 15장. 설계의 의의와 설계를 대하는 방법
+
+- 소프트웨어 제품 품질 특성
+
+  - 기능 적합성 : 기능이 니즈를 만족하는 정도
+  - 성능 효율성 : 리소스 효율과 성능 정도
+  - 호환성 : 다른 시스템과 정보 공유, 교환할 수 있는 정도
+  - 사용성 : 사용자가 시스템을 만족하며 사용하는지 나타내는 정도
+  - 신뢰성 : 필요할 때 기능을 실행
+
+  | 품질 큭성   | 설명                                                         | 품질 관련 부가적인 특성                                |
+    | ----------- | ------------------------------------------------------------ | ------------------------------------------------------ |
+  | 기능 적합성 | 기능이 니즈를 만족하는 정도                                  | 기능 무결성, 기능 정확성, 기능 적절성                  |
+  | 성능 효율성 | 리소스 효율과 성능 정도                                      | 시간 효율성, 자원 효율성, 용량 만족성                  |
+  | 호환성      | 다른 시스템과 정보 공유, 교환할 수 있는 정도                 | 공존성, 상호 운용성                                    |
+  | 사용성      | 사용자가 시스템을 만족하며 사용하는지 나타내는 정도          | 적절도 인식성, 습득성, 운용 조작성, 사용자 오류 방지성 |
+  | 신뢰성      | 필요할 때 기능을 실행할 수 있는 정도                         | 성숙성, 가용성, 장애 허용성, 회복성                    |
+  | 보안        | 허용되지 않은 사용으로부터 보호할 수 있는 정도               | 기밀성, 무결성, 부인 방지성, 책임 추적성, 인증성       |
+  | 유지 보수성 | 시스템이 정상 운용되도록 유지 보수하기가 얼마나 쉬운가를 나타내는 정도 | 모듈성, 재사용성, 분석성, 수정성, 시험성               |
+  | 이식성      | 다른 실행 환경에 이식할 수 있는 정도                         | 적응성, 설치성, 치환성                                 |
+
+## 코드의 좋고 나쁨을 판단하는 지표
+
+### 코드 메트릭
+
+- 실행되는 코드의 줄 수
+
+  - 주석을 제외하고, 실행되는 로직을 포함하는 코드의 줄 수
+  - 수가 많을 수록, 너무 많은 일을 하고 있는 가능성이 높다.
+
+  | 스코프 | 줄 수 상한 |
+    | ------ | ---------- |
+  | 메서드 | 10줄 이내  |
+  | 클래스 | 100줄 이내 |
+
+  - 메서드와 클래스 분할을 통해 해결
+
+- 순환 복잡도
+
+  - 코드의 구조적인 복잡함을 나타내는 지표
+  - 조건 분기, 반복 처리, 중첩이 많아지면 커진다.
+  - 조기 리턴, 전략 패턴, 일급 컬렉션 등으로 줄이지
+  - 이상적인 복잡도는 10 ~ 15
+
+- 응집도
+
+  - LCOM 도구가 있음
+
+- 결합도
+
+  - 분석 도구나
+  - 호출하는 클래스 수를 세거나, 클래스 다이어그램을 그려보며 파악
+  - 단일 책임 원칙, 클래스 분할 검토
+
+- 청크
+
+  - 클래스에서 다루는 개념이 4+-1 정도가 되도록 설계
+  - 커지면 분할
+
+### 코드 분석을 지원하는 다양한 도구
+
+- Code Climate Quality
+  - 깃허브와 연동해서 레포에 저장된 코드의 품질 점수를 자동으로 계산
+  - 자체 계산식을 사용해 기술 부채 산출
+  - 부채의 증감을 시각화해줌
+  - 변경 빈도가 높은 곳을 찾을 수 있어 중요도가 높은 서비스를 찾기 쉬움
+- Understand
+- Visual Studio
+- 구문 강조를 통해 품질 시각화에 활용하기
+
+### 설계 대상과 비용 대비 효과
+
+- 비용 대비 효과가 높은 부분을 노려 리팩토링 하자!
+- 파레토의 법칙 (80:20 법칙)
+  - 매출의 80%는 전체 상품 중 20%가 차지한다.
+  - 기능의 중요성, 사양 변경 빈도에 주목해 그 부분을 중점으로 리팩초링
+- 코어 도메인 : 서비스의 중심 영역
+  - 시스템에서 가장 큰 가치를 창출하는 곳
+  - 경쟁 우위에 있고, 차별점을 만들며, 비즈니스 우위를 만들 수 있는 곳
+
+
+
+# 16장. 설계 공부 계속하기
+
+### 코딩 규칙 사용
+
+- 언어별 코딩 규칙
+  - [java](https://google.github.io/styleguide/javaguide.html)
+
+### 추천 도서
+
+- 현장에서 유용한 시스템 설계 원칙
+  - 변경이 쉬운 설계에 대해 비즈니스 개념을 중심으로 설명
+- 읽기 좋은 코드가 좋은 코드다
+- 리팩터링 2판 + 클린코드
+- 레거시 코드 활용 전략
+  - 사양을 알 수 없고, 테스트도 없는 코드를 분석해서 리팩토링 하는 전략
+- 레거시 소프트웨어 리엔지니어링
+  - 계획과 조직에 초점을 맞춘 책
+- 레거시 코드를 넘어서
+  - 애자일 개발 방법을 중심으로 팀 운영 방법 설명
+- 프로그래밍의 원칙
+  - SOLID 원칙을 기반으로 설계 개선
+- 클린 아키텍처
+- 도메인 주도 설계 철저 입문 -> 도메인 주도 설계 + 설계를 통한 보안
+- 도메인 주도 설계 모델링/구현 가이드
+  - Q&A가 좋아서, 설계에 어려운을 겪을 때 읽어보면 좋음
+
+### 설계 스킬을 높이는 학습 방법
+
+- 인풋은 2 , 아웃풋은 8
+
+  - 코드에 바로 적용해보며 시행 착오를 경험해 봐야 한다
+
+- 설계 효과 반드시 검증
+
+  - 설계 전후에 설계 효과를 확인해야 한다.
+  - 설계 적용 후에 해당 효과가 제대로 발생헀는지 확인
+
+  - 어설프게 배운 디자인 패턴을 적용해 코드가 복잡해 질 수 있다.
+
+- 리팩토링 대상 쉬운것 부터 찾기
+
+  - public, 줄 수 많은 것은 난이도 높음
+  - private, 줄 수 적은것 위주로 먼저 시작 
