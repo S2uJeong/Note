@@ -5,20 +5,27 @@ S2uJeong's Note
 - 💻 정보처리기사 ✔
   - 📁resource/engineerInformationProcessing
 - 💻 SQLD ✔
-  - 📁resource/sqld
+  - 📁/sqld
+### 클린코드
+- 📒 헤드 퍼스트 디자인 패턴
+  - 24년 07월 15일 ~
+  - 📁/designPattern
+- 📒 내 코드가 그렇게 이상한가요?
+  - 25년 1월
+  - 📁/bookStrangeCode
 ### 아키텍처
 - resource/architecture
 - 📒 클린아키텍처 ✔
   - 24년 03월 ~ 04월 
-  - 📁/cleanArchitecture 
-- 📒 헤드 퍼스트 디자인 패턴
-  - 24년 07월 15일 ~ 
-  - 📁/designPattern
+  - 📁/cleanArchitecture
 - 📒 실시간 데이터 파이프라인 아키텍처 - 앤드류 살티스 ✔
   - 📁/streamingDataArchitecture
 - 📒 그림으로 공부하는 마이크로 서비스 구조 ✔
   - 24년 6월 26일  
-  - 📁resource/msa
+  - 📁/msa
+- 📒 만들면서 배우는 클린 아키텍처 - 톰 홀버그 ✔
+  - 24년 10월 17일 ~ 12월 20일
+  - https://s2ujeong.tistory.com/13
 ### 개발 방법론
 - 📒 테스트 주도 개발 시작하기 
   - 24년 7월 3일 
