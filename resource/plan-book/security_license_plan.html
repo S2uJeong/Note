@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>정보보안기사 실기 65일 공부 계획</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; padding: 1.5rem; color: #1a1a1a; }
+    .wrap { max-width: 780px; margin: 0 auto; }
+    h1 { font-size: 20px; font-weight: 600; margin-bottom: 1.5rem; }
+    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 2rem; }
+    .stat-card { background: #fff; border-radius: 8px; padding: 12px; text-align: center; border: 0.5px solid #e0e0e0; }
+    .stat-val { font-size: 18px; font-weight: 700; }
+    .stat-lbl { font-size: 11px; color: #888; margin-top: 2px; }
+    .stat-val.green { color: #27a06b; }
+    .stat-val.blue  { color: #378ADD; }
+    .stat-val.red   { color: #E24B4A; }
+    .section-lbl { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .book-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; font-size: 12px; background: #fff; border-radius: 10px; overflow: hidden; border: 0.5px solid #e0e0e0; }
+    .book-table th { text-align: left; padding: 8px 10px; color: #666; font-weight: 600; background: #f9f9f9; border-bottom: 0.5px solid #e0e0e0; }
+    .book-table td { padding: 8px 10px; border-bottom: 0.5px solid #f0f0f0; color: #222; vertical-align: top; line-height: 1.5; }
+    .book-table tr:last-child td { border-bottom: none; }
+    .tag-pill { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600; }
+    .p1 { background: #EEEDFE; color: #3C3489; }
+    .p2 { background: #E1F5EE; color: #085041; }
+    .p3 { background: #E6F1FB; color: #0C447C; }
+    .p4 { background: #FAEEDA; color: #633806; }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; align-items: center; }
+    .leg-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #555; }
+    .leg-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .overall-progress { background: #fff; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 2rem; border: 0.5px solid #e0e0e0; }
+    .op-label { font-size: 13px; font-weight: 600; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .op-bar-wrap { height: 10px; background: #eee; border-radius: 10px; overflow: hidden; }
+    .op-bar { height: 100%; background: linear-gradient(90deg, #27a06b, #5DCAA5); border-radius: 10px; transition: width 0.4s; }
+    .month-block { margin-bottom: 2rem; }
+    .month-label { font-size: 15px; font-weight: 600; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; gap: 10px; }
+    .month-progress-wrap { flex: 1; height: 6px; background: #eee; border-radius: 10px; overflow: hidden; }
+    .month-progress-bar { height: 100%; background: #27a06b; border-radius: 10px; transition: width 0.3s; }
+    .month-progress-label { font-size: 11px; color: #27a06b; font-weight: 600; white-space: nowrap; }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-head { font-size: 11px; color: #888; text-align: center; padding: 4px 0; font-weight: 600; }
+    .cal-head.sun { color: #E24B4A; }
+    .cal-head.sat { color: #378ADD; }
+    .day { border-radius: 6px; padding: 5px 5px; min-height: 72px; border: 0.5px solid #e0e0e0; background: #fff; font-size: 11px; position: relative; }
+    .day.empty { background: transparent; border-color: transparent; }
+    .day.clickable { cursor: pointer; transition: border-color 0.15s; }
+    .day.clickable:hover { border-color: #999; }
+    .day.selected { border: 2px solid #378ADD !important; }
+    .day.off { background: #f5f5f5; opacity: 0.5; }
+    .day-num { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
+    .day.sun .day-num { color: #E24B4A; }
+    .day.sat .day-num { color: #378ADD; }
+    .hours-text { font-size: 9px; color: #aaa; margin-top: 2px; line-height: 1.3; }
+    .day.done { opacity: 0.6; }
+    .day.done::after { content: "✓"; position: absolute; top: 4px; right: 5px; font-size: 14px; font-weight: 700; color: #27a06b; line-height: 1; }
+    .day.done .day-num { text-decoration: line-through; color: #aaa !important; }
+    .detail-panel { background: #fff; border-radius: 10px; padding: 1.2rem 1.4rem; margin-top: 1.5rem; border: 0.5px solid #e0e0e0; min-height: 100px; }
+    .detail-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .detail-body { font-size: 13px; color: #555; line-height: 1.8; margin-bottom: 14px; }
+    .check-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: background 0.15s; }
+    .check-btn.undone { background: #27a06b; color: #fff; }
+    .check-btn.undone:hover { background: #1e8457; }
+    .check-btn.done-btn { background: #f0f0f0; color: #888; }
+    .check-btn.done-btn:hover { background: #ddd; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>&#128218; 정보보안기사 실기 65일 공부 계획 (2026.05.20 ~ 07.25)</h1>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val">65일</div><div class="stat-lbl">총 기간</div></div>
+    <div class="stat-card"><div class="stat-val">61일</div><div class="stat-lbl">실공부일</div></div>
+    <div class="stat-card"><div class="stat-val green" id="s-done">0일</div><div class="stat-lbl">완료한 날</div></div>
+    <div class="stat-card"><div class="stat-val blue" id="s-remain">61일</div><div class="stat-lbl">남은 공부일</div></div>
+    <div class="stat-card"><div class="stat-val red" id="s-pct">0%</div><div class="stat-lbl">진행률</div></div>
+  </div>
+
+  <div class="overall-progress">
+    <div class="op-label"><span>전체 진행률</span><span id="op-pct-label">0 / 61일 완료</span></div>
+    <div class="op-bar-wrap"><div class="op-bar" id="op-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="section-lbl">책 목차 기반 페이즈 배분</div>
+  <table class="book-table">
+    <tr><th>페이즈</th><th>이론편 (6 PART)</th><th>문제편 병행</th><th>기간</th></tr>
+    <tr><td><span class="tag-pill p1">Phase 1</span></td><td>PART1 시스템 (~p163)<br>PART2 네트워크 (p164~395)</td><td>문제편 Sec1·2 단답형</td><td>5/20~6/7</td></tr>
+    <tr><td><span class="tag-pill p2">Phase 2</span></td><td>PART3 애플리케이션 (p396~575)<br>PART4 침해사고 (p576~737)</td><td>문제편 Sec3·4 단답형</td><td>6/8~6/22</td></tr>
+    <tr><td><span class="tag-pill p3">Phase 3</span></td><td>PART5 정보보안일반 (p738~789)<br>PART6 법규 (p790~837)</td><td>문제편 서술형·실무형 + CBT</td><td>6/23~7/13</td></tr>
+    <tr><td><span class="tag-pill p4">Phase 4</span></td><td>전체 이론 핵심 압축 재정리</td><td>문제편 오답 반복 + CBT 모의고사</td><td>7/14~7/24</td></tr>
+  </table>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#EEEDFE;border:1px solid #AFA9EC;"></div>Phase 1</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#E1F5EE;border:1px solid #5DCAA5;"></div>Phase 2</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#E6F1FB;border:1px solid #85B7EB;"></div>Phase 3</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#FAEEDA;border:1px solid #EF9F27;"></div>Phase 4</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#FAECE7;border:1px solid #F0997B;"></div>여행</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#EAF3DE;border:1px solid #97C459;"></div>시험일</div>
+    <div class="leg-item"><span style="color:#27a06b;font-size:15px;font-weight:700;">✓</span>&nbsp;완료</div>
+  </div>
+
+  <div id="calendars"></div>
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-title">날짜를 클릭하면 상세 내용을 볼 수 있어요</div>
+    <div class="detail-body">색깔 있는 날짜 칸을 클릭 → 하단의 <b>공부 완료 버튼</b>으로 체크하세요.</div>
+  </div>
+</div>
+
+<script>
+  var STORAGE_KEY = "secStudyDone_v1";
+  var SCHEDULE = {};
+  var doneSet = {};
+  try { var sv = localStorage.getItem(STORAGE_KEY); if (sv) doneSet = JSON.parse(sv); } catch(e){}
+  function saveDone(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(doneSet)); }catch(e){} }
+
+  var planDays = [
+    {date:"2026-05-20",phase:1,tag:"이론",plan:"PART1 시스템 - Sec01 시스템기본 ①",note:"윈도우 기본 학습",hours:2,book:"이론편 p3~47"},
+    {date:"2026-05-21",phase:1,tag:"이론",plan:"PART1 시스템 - Sec01 시스템기본 ②",note:"UNIX/Linux 기본·시스템 관리",hours:2,book:"이론편 p9~60"},
+    {date:"2026-05-22",phase:1,tag:"이론",plan:"PART1 시스템 - Sec01~03 마무리",note:"서버 보안·시스템 해킹·취약점",hours:2,book:"이론편 p61~163"},
+    {date:"2026-05-23",travel:true},{date:"2026-05-24",travel:true},{date:"2026-05-25",travel:true},{date:"2026-05-26",travel:true},
+    {date:"2026-05-27",phase:1,tag:"이론",plan:"PART2 네트워크 - Sec04 기본 ①",note:"OSI·ARP/RARP·IP 프로토콜",hours:3,book:"이론편 p165~200"},
+    {date:"2026-05-28",phase:1,tag:"이론",plan:"PART2 네트워크 - Sec04 기본 ②",note:"ICMP·TCP·UDP·네트워크 기술",hours:2,book:"이론편 p200~256"},
+    {date:"2026-05-29",phase:1,tag:"이론",plan:"PART2 네트워크 - Sec04 공격 유형",note:"스니핑·포트스캔·DoS·DDoS·무선LAN",hours:2,book:"이론편 p256~345"},
+    {date:"2026-05-30",phase:1,tag:"이론",plan:"PART2 네트워크 - Sec05 보안 프로토콜",note:"VPN·IPsec·SSL/TLS",hours:3,book:"이론편 p347~382"},
+    {date:"2026-05-31",phase:1,tag:"이론",plan:"PART2 네트워크 - Sec06 라우터 보안",note:"라우터·ACL·네트워크보안",hours:3,book:"이론편 p383~395"},
+    {date:"2026-06-01",phase:1,tag:"문제",plan:"Sec1 시스템보안 단답형 ①",note:"시스템보안 단답형 전반",hours:2,book:"문제편 p6~79"},
+    {date:"2026-06-02",phase:1,tag:"문제",plan:"Sec1 시스템보안 단답형 ②",note:"시스템보안 단답형 마무리",hours:2,book:"문제편 p6~79"},
+    {date:"2026-06-03",phase:1,tag:"문제",plan:"Sec2 네트워크보안 단답형 ①",note:"네트워크 단답형 전반",hours:2,book:"문제편 p138~225"},
+    {date:"2026-06-04",phase:1,tag:"문제",plan:"Sec2 네트워크보안 단답형 ②",note:"네트워크 단답형 마무리",hours:2,book:"문제편 p138~225"},
+    {date:"2026-06-05",phase:1,tag:"복습",plan:"PART1+2 취약 포인트 재정리",note:"틀린 단답형 오답 + 이론 재확인",hours:2,book:"이론편+문제편"},
+    {date:"2026-06-06",off:true},
+    {date:"2026-06-07",phase:1,tag:"정리",plan:"Phase 1 전체 키워드 정리",note:"시스템·네트워크 핵심 키워드 노트 작성",hours:3,book:"이론편 PART1~2"},
+    {date:"2026-06-08",phase:2,tag:"이론",plan:"PART3 애플리케이션 - Sec07 기본 ①",note:"DNS·HTTP·FTP",hours:2,book:"이론편 p397~424"},
+    {date:"2026-06-09",phase:2,tag:"이론",plan:"PART3 애플리케이션 - Sec07 기본 ②",note:"SNMP·DHCP",hours:2,book:"이론편 p433~438"},
+    {date:"2026-06-10",phase:2,tag:"이론",plan:"PART3 애플리케이션 - Sec08 웹취약점 ①",note:"SQL Injection·XSS·CSRF",hours:2,book:"이론편 p439~470"},
+    {date:"2026-06-11",phase:2,tag:"이론",plan:"PART3 애플리케이션 - Sec08 웹취약점 ②",note:"파일업로드·경로추적·파일삽입·세션관리",hours:2,book:"이론편 p470~509"},
+    {date:"2026-06-12",phase:2,tag:"이론",plan:"PART3 애플리케이션 - Sec09~12",note:"웹서버취약점·이메일·DB보안·클라우드",hours:2,book:"이론편 p510~574"},
+    {date:"2026-06-13",phase:2,tag:"문제",plan:"Sec3 애플리케이션 단답형 ①",note:"애플리케이션 단답형 전반",hours:3,book:"문제편 p312~387"},
+    {date:"2026-06-14",phase:2,tag:"문제",plan:"Sec3 애플리케이션 단답형 ②",note:"애플리케이션 단답형 마무리",hours:3,book:"문제편 p312~387"},
+    {date:"2026-06-15",phase:2,tag:"이론",plan:"PART4 침해사고 - Sec13 보안장비 ①",note:"Snort 침입탐지 시스템",hours:2,book:"이론편 p577~603"},
+    {date:"2026-06-16",phase:2,tag:"이론",plan:"PART4 침해사고 - Sec13 보안장비 ②",note:"iptables·보안솔루션·네트워크보안장비",hours:2,book:"이론편 p603~643"},
+    {date:"2026-06-17",phase:2,tag:"이론",plan:"PART4 침해사고 - Sec14·15",note:"시스템 점검도구·침해사고 유형별 시나리오",hours:2,book:"이론편 p644~715"},
+    {date:"2026-06-18",phase:2,tag:"이론",plan:"PART4 침해사고 - Sec16 주요취약점",note:"ShellShock·SSL·NTP·SSDP DDoS",hours:2,book:"이론편 p717~737"},
+    {date:"2026-06-19",phase:2,tag:"문제",plan:"Sec4 침해사고 단답형 ①",note:"침해사고 단답형 전반",hours:2,book:"문제편 p450~524"},
+    {date:"2026-06-20",phase:2,tag:"문제",plan:"Sec4 침해사고 단답형 ②",note:"침해사고 단답형 마무리",hours:3,book:"문제편 p450~524"},
+    {date:"2026-06-21",phase:2,tag:"복습",plan:"PART3+4 취약 포인트 재정리",note:"오답 분석 + 이론 재확인",hours:3,book:"이론편+문제편"},
+    {date:"2026-06-22",phase:2,tag:"정리",plan:"Phase 2 전체 키워드 정리",note:"애플리케이션·침해사고 핵심 키워드 노트",hours:2,book:"이론편 PART3~4"},
+    {date:"2026-06-23",phase:3,tag:"이론",plan:"PART5 정보보안일반 - Sec17 ①",note:"정보보호개요·접근통제·정보보호정책",hours:2,book:"이론편 p739~753"},
+    {date:"2026-06-24",phase:3,tag:"이론",plan:"PART5 정보보안일반 - Sec17 ②",note:"위험관리·BCP/DRP·침해사고·포렌식",hours:2,book:"이론편 p753~784"},
+    {date:"2026-06-25",phase:3,tag:"이론",plan:"PART6 법규 - Sec18 ①",note:"개인정보보호법·안전성확보조치",hours:2,book:"이론편 p791~824"},
+    {date:"2026-06-26",phase:3,tag:"이론",plan:"PART6 법규 - Sec18 ②",note:"정보통신망법·전자서명법·위치정보법",hours:2,book:"이론편 p824~837"},
+    {date:"2026-06-27",phase:3,tag:"문제",plan:"Sec5·6 단답형",note:"정보보안일반 + 정보보안관리/법규 단답형",hours:3,book:"문제편 p584~686"},
+    {date:"2026-06-28",phase:3,tag:"문제",plan:"Sec1·2 서술형·실무형",note:"시스템보안·네트워크보안 서술형+실무형",hours:3,book:"문제편 p80~310"},
+    {date:"2026-06-29",phase:3,tag:"문제",plan:"Sec3·4 서술형·실무형",note:"애플리케이션·침해사고 서술형+실무형",hours:2,book:"문제편 p388~582"},
+    {date:"2026-06-30",phase:3,tag:"문제",plan:"Sec5·6 서술형·실무형",note:"정보보안일반·정보보안관리/법규 서술형+실무형",hours:2,book:"문제편 p600~720"},
+    {date:"2026-07-01",phase:3,tag:"CBT",plan:"뉴비티 기출 ①",note:"newbt.kr 최근 2회분 풀기",hours:2,book:"뉴비티 CBT"},
+    {date:"2026-07-02",phase:3,tag:"CBT",plan:"뉴비티 기출 ② + 오답노트",note:"오답 원인 분석 + 이론편 재확인",hours:2,book:"뉴비티 CBT"},
+    {date:"2026-07-03",phase:3,tag:"CBT",plan:"뉴비티 기출 ③",note:"2회분 추가 풀기 + 오답노트",hours:2,book:"뉴비티 CBT"},
+    {date:"2026-07-04",phase:3,tag:"복습",plan:"오답 집중 재복습 ①",note:"1~2주차 취약 항목 이론 재정리",hours:3,book:"이론편+오답노트"},
+    {date:"2026-07-05",phase:3,tag:"CBT",plan:"뉴비티 ④ + comcbt",note:"뉴비티 2회분 + comcbt.com 교차 풀이",hours:3,book:"CBT"},
+    {date:"2026-07-06",phase:3,tag:"문제",plan:"부록 명령어 요약 암기",note:"문제편 명령어 요약 집중 암기",hours:2,book:"문제편 p722~"},
+    {date:"2026-07-07",phase:3,tag:"CBT",plan:"뉴비티 기출 ⑤",note:"2회분 풀기 + 오답노트",hours:2,book:"뉴비티 CBT"},
+    {date:"2026-07-08",phase:3,tag:"CBT",plan:"뉴비티 기출 ⑥",note:"2회분 풀기 + 오답노트",hours:2,book:"뉴비티 CBT"},
+    {date:"2026-07-09",phase:3,tag:"복습",plan:"오답 집중 재복습 ②",note:"3~4주차 오답노트 전체 재풀이",hours:2,book:"오답노트"},
+    {date:"2026-07-10",phase:3,tag:"CBT",plan:"뉴비티 기출 ⑦",note:"2회분 풀기 + 오답 분석",hours:2,book:"뉴비티 CBT"},
+    {date:"2026-07-11",phase:3,tag:"CBT",plan:"cbtbank 통합 모의고사 ①",note:"시간 제한 실전처럼 풀기",hours:3,book:"cbtbank.kr"},
+    {date:"2026-07-12",phase:3,tag:"CBT",plan:"cbtbank 통합 모의고사 ②",note:"실전 + 오답 총정리",hours:3,book:"cbtbank.kr"},
+    {date:"2026-07-13",phase:3,tag:"정리",plan:"Phase 3 오답노트 최종 확인",note:"전체 오답노트 한 번 더 훑기",hours:2,book:"오답노트"},
+    {date:"2026-07-14",phase:4,tag:"암기",plan:"핵심 압축 ① 시스템보안",note:"이론편 PART1 핵심 키워드 A4 정리",hours:2,book:"이론편 PART1"},
+    {date:"2026-07-15",phase:4,tag:"암기",plan:"핵심 압축 ② 네트워크보안",note:"이론편 PART2 핵심 키워드 A4 정리",hours:2,book:"이론편 PART2"},
+    {date:"2026-07-16",phase:4,tag:"암기",plan:"핵심 압축 ③ 애플리케이션보안",note:"이론편 PART3 핵심 키워드 A4 정리",hours:2,book:"이론편 PART3"},
+    {date:"2026-07-17",phase:4,tag:"암기",plan:"핵심 압축 ④ 침해사고+일반+법규",note:"이론편 PART4~6 핵심 키워드 A4 정리",hours:2,book:"이론편 PART4~6"},
+    {date:"2026-07-18",phase:4,tag:"실전",plan:"모의고사 ① + 오답 분석",note:"CBT 시간 재고 실전 풀이",hours:3,book:"CBT"},
+    {date:"2026-07-19",phase:4,tag:"실전",plan:"모의고사 ② + 오답 분석",note:"CBT 시간 재고 실전 + 오답",hours:3,book:"CBT"},
+    {date:"2026-07-20",phase:4,tag:"암기",plan:"명령어 요약 최종 암기",note:"문제편 부록 명령어 요약 최종 점검",hours:2,book:"문제편 p722~"},
+    {date:"2026-07-21",phase:4,tag:"실전",plan:"모의고사 ③",note:"최종 모의고사 + 오답 빠른 확인",hours:2,book:"CBT"},
+    {date:"2026-07-22",phase:4,tag:"점검",plan:"약점 최종 확인",note:"오답노트 중 불안한 항목만 집중",hours:2,book:"오답노트"},
+    {date:"2026-07-23",phase:4,tag:"암기",plan:"압축 요약 최종 회독",note:"A4 요약 자료 전체 훑기",hours:2,book:"요약 자료"},
+    {date:"2026-07-24",phase:4,tag:"정리",plan:"D-1 가볍게 마무리",note:"핵심 키워드만 훑고 컨디션 관리",hours:1,book:"요약 자료"},
+    {date:"2026-07-25",exam:true}
+  ];
+
+  planDays.forEach(function(d){ SCHEDULE[d.date] = d; });
+
+  var studyDates = planDays.filter(function(d){ return d.phase; }).map(function(d){ return d.date; });
+  var TOTAL_STUDY = studyDates.length;
+  var phaseLabels = {1:"Phase 1 · 시스템+네트워크",2:"Phase 2 · 애플리케이션+침해사고",3:"Phase 3 · 일반+법규+문제편+CBT",4:"Phase 4 · 마무리 총정리"};
+  var phasePills = {1:"p1",2:"p2",3:"p3",4:"p4"};
+  var phaseBg = {1:"#EEEDFE",2:"#E1F5EE",3:"#E6F1FB",4:"#FAEEDA"};
+  var selectedDate = null;
+
+  function updateStats(){
+    var doneCount = Object.keys(doneSet).filter(function(k){ return doneSet[k]; }).length;
+    var remain = TOTAL_STUDY - doneCount;
+    var pct = Math.round(doneCount/TOTAL_STUDY*100);
+    document.getElementById("s-done").textContent = doneCount+"일";
+    document.getElementById("s-remain").textContent = remain+"일";
+    document.getElementById("s-pct").textContent = pct+"%";
+    document.getElementById("op-bar").style.width = pct+"%";
+    document.getElementById("op-pct-label").textContent = doneCount+" / "+TOTAL_STUDY+"일 완료";
+    ["2026-05","2026-06","2026-07"].forEach(function(ym){
+      var md = studyDates.filter(function(d){ return d.startsWith(ym); });
+      var mc = md.filter(function(d){ return doneSet[d]; }).length;
+      var bar = document.getElementById("bar-"+ym);
+      var lbl = document.getElementById("lbl-"+ym);
+      if(bar) bar.style.width = (md.length ? Math.round(mc/md.length*100) : 0)+"%";
+      if(lbl) lbl.textContent = mc+"/"+md.length;
+    });
+  }
+
+  function toggleDone(dateStr){
+    doneSet[dateStr] = !doneSet[dateStr];
+    saveDone();
+    var cell = document.querySelector("[data-date=\""+dateStr+"\"]");
+    if(cell){ if(doneSet[dateStr]) cell.classList.add("done"); else cell.classList.remove("done"); }
+    updateStats();
+    if(selectedDate===dateStr) showDetail(dateStr);
+  }
+
+  function showDetail(dateStr){
+    var s = SCHEDULE[dateStr];
+    if(!s||!s.phase) return;
+    selectedDate = dateStr;
+    var d = new Date(dateStr+"T00:00:00");
+    var yoil = ["일","월","화","수","목","금","토"][d.getDay()];
+    var isDone = !!doneSet[dateStr];
+    var panel = document.getElementById("detail-panel");
+    panel.innerHTML =
+        "<div class=\"detail-title\">"+dateStr+" ("+yoil+") | "+s.hours+"시간"+(isDone?" <span style=\"color:#27a06b;\">✓ 완료</span>":"")+"</div>"+
+        "<div style=\"margin-bottom:10px\"><span class=\"tag-pill "+phasePills[s.phase]+"\">"+phaseLabels[s.phase]+"</span> <span class=\"tag-pill\" style=\"background:#f0f0f0;color:#555;\">"+s.tag+"</span></div>"+
+        "<div class=\"detail-body\"><b>오늘 할 것</b> "+s.plan+"<br><span style=\"color:#777;\">내용 "+s.note+"</span><br><span style=\"color:#aaa;\">참고 "+s.book+"</span></div>"+
+        "<button class=\"check-btn "+(isDone?"done-btn":"undone")+"\" onclick=\"toggleDone('"+dateStr+"')\">"+(isDone?"↩ 완료 취소":"✓ 오늘 공부 완료!")+"</button>";
+    document.querySelectorAll(".day.selected").forEach(function(el){ el.classList.remove("selected"); });
+    var cell = document.querySelector("[data-date=\""+dateStr+"\"]");
+    if(cell) cell.classList.add("selected");
+  }
+
+  function buildMonth(year,month){
+    var mNames=["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+    var dNames=["일","월","화","수","목","금","토"];
+    var ym=year+"-"+String(month+1).padStart(2,"0");
+    var firstDow=new Date(year,month,1).getDay();
+    var lastDate=new Date(year,month+1,0).getDate();
+    var html="<div class=\"month-block\"><div class=\"month-label\">"+year+"년 "+mNames[month]+"&nbsp;<div class=\"month-progress-wrap\"><div class=\"month-progress-bar\" id=\"bar-"+ym+"\" style=\"width:0%\"></div></div><span class=\"month-progress-label\" id=\"lbl-"+ym+"\">0/0</span></div><div class=\"calendar\">";
+    dNames.forEach(function(d,i){ html+="<div class=\"cal-head"+(i===0?" sun":i===6?" sat":"")+"\">"+ d+"</div>"; });
+    for(var i=0;i<firstDow;i++) html+="<div class=\"day empty\"></div>";
+    for(var date=1;date<=lastDate;date++){
+      var ds=year+"-"+String(month+1).padStart(2,"0")+"-"+String(date).padStart(2,"0");
+      var s=SCHEDULE[ds];
+      var dow=new Date(year,month,date).getDay();
+      var cls="day"+(dow===0?" sun":dow===6?" sat":"");
+      var style=""; var inner="<div class=\"day-num\">"+date+"</div>"; var dataAttr="";
+      if(s){
+        if(s.travel){ style="background:#FAECE7;"; inner+="<span class=\"tag-pill\" style=\"background:#FAECE7;color:#993C1D;\">✈ 오사카</span>"; }
+        else if(s.exam){ style="background:#EAF3DE;"; inner+="<span class=\"tag-pill\" style=\"background:#EAF3DE;color:#27500A;\">시험일</span><div class=\"hours-text\">정보보안기사 실기</div>"; }
+        else if(s.off){ cls+=" off"; inner+="<div style=\"font-size:10px;color:#aaa;margin-top:2px;\">현충일</div>"; }
+        else if(s.phase){
+          style="background:"+phaseBg[s.phase]+";";
+          cls+=" clickable"; if(doneSet[ds]) cls+=" done";
+          dataAttr="data-date=\""+ds+"\"";
+          inner+="<span class=\"tag-pill "+phasePills[s.phase]+"\">"+s.tag+"</span>";
+          var sp=s.plan.substring(0,13)+(s.plan.length>13?"…":"");
+          inner+="<div class=\"hours-text\">"+s.hours+"h · "+sp+"</div>";
+        }
+      }
+      html+="<div class=\""+cls+"\" style=\""+style+"\" "+dataAttr+">"+inner+"</div>";
+    }
+    var lastDow=new Date(year,month,lastDate).getDay();
+    if(lastDow<6) for(var j=lastDow+1;j<=6;j++) html+="<div class=\"day empty\"></div>";
+    html+="</div></div>"; return html;
+  }
+
+  var cal=document.getElementById("calendars");
+  cal.innerHTML=buildMonth(2026,4)+buildMonth(2026,5)+buildMonth(2026,6);
+  cal.addEventListener("click",function(e){ var cell=e.target.closest("[data-date]"); if(cell) showDetail(cell.getAttribute("data-date")); });
+  updateStats();
+</script>
+</body>
+</html>
